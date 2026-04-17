@@ -34,20 +34,20 @@ const features = [
   {
     num: '01',
     icon: Shield,
-    title: 'Durabilidad extrema',
-    desc: 'Materiales resistentes a impactos, agua y desgaste. Certificados para las condiciones más exigentes del terreno.',
+    title: 'Resistencia Alpha',
+    desc: 'Materiales compuestos de grado militar, resistentes a impactos, agua y abrasión extrema. Certificados para las condiciones más exigentes del terreno, ya sea una mordida o una caída en el asfalto.',
   },
   {
     num: '02',
     icon: Radio,
-    title: 'GPS en tiempo real',
-    desc: 'Rastreo preciso con actualización cada 10 segundos. Compatible con iOS y Android sin suscripción adicional.',
+    title: 'Ingeniería Funcional',
+    desc: 'Paneles MOLLE integrados y puntos de anclaje técnicos. Adapta tu carga (bandolera o pechera) con la misma facilidad que tu mascota lleva su arnés de alto rendimiento.',
   },
   {
     num: '03',
     icon: Eye,
-    title: 'Diseño ergonómico',
-    desc: 'Formas estudiadas para máxima comodidad en movimiento. Probadas por más de 500 horas en campo.',
+    title: 'Ergonomía Dinámica',
+    desc: 'Formas estudiadas para máxima comodidad en movimiento tanto para el humano como para el animal. Diseños probados por más de 500 horas en campo para garantizar un ajuste perfecto sin restricciones.',
   },
 ];
 
@@ -55,22 +55,22 @@ const features = [
 
 const testimonials = [
   {
-    quote: 'El collar GPS cambió completamente la forma en que salgo a correr con mi perro. Tranquilidad total en tiempo real.',
-    initials: 'MG',
-    name: 'María González',
-    role: 'Dueña de mascota · Buenos Aires',
+    quote: 'La cama BlackWolf es sencillamente indestructible. Mis perros suelen romper todo, pero esta sigue intacta después de meses de uso intensivo. Finalmente, equipamiento que está a la altura de su energía.',
+    initials: 'MB',
+    name: 'Matías Bianchi',
+    role: 'Adiestrador Canino · Córdoba',
   },
   {
-    quote: 'Tecnología de vanguardia con un diseño que no grita. Mi tracker GPS es lo primero que meto en la mochila antes de cada salida.',
-    initials: 'CR',
-    name: 'Carlos Rodríguez',
-    role: 'Trail runner · Mendoza',
+    quote: 'El chest rig para celular es perfecto para mis sesiones de trail running. No rebota, protege mi teléfono y tiene espacio para lo esencial. Me da una libertad total de movimiento.',
+    initials: 'EV',
+    name: 'Elena Valenzuela',
+    role: 'Trail Runner · Bariloche',
   },
   {
-    quote: 'Cada producto está pensado para durar. No es equipamiento descartable — se nota que detrás hay alguien que realmente lo usa.',
-    initials: 'AL',
-    name: 'Ana López',
-    role: 'Entrenadora fitness · Rosario',
+    quote: 'Me encanta la estética técnica y oscura. Uso la riñonera BlackWolf a diario para ir al estudio y combino el arnés de mi perro para nuestros paseos. Se nota que detrás hay alguien que realmente usa estos productos.',
+    initials: 'JP',
+    name: 'Javier Pérez',
+    role: 'Fotógrafo de Naturaleza · Buenos Aires',
   },
 ];
 
@@ -103,8 +103,8 @@ export default function HomePage() {
         {/* Background */}
         <div className="absolute inset-0 -z-0">
           <img
-            src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=70"
-            alt="BlackWolf aventura"
+            src="https://images.unsplash.com/photo-1589557933842-a32866d4ec23?w=800&q=70"
+            alt="BlackWolf - Equipamiento Alpha"
             className="w-full h-full object-cover"
             loading="eager"
           />
@@ -119,15 +119,15 @@ export default function HomePage() {
           <div
             className="max-w-xl"
           >
-            <SectionLabel>Nueva colección 2025</SectionLabel>
+            <SectionLabel>Nueva Colección 2026</SectionLabel>
 
             <h1 className="font-display font-bold text-[clamp(3.5rem,8vw,7rem)] leading-[0.9] tracking-tight mt-2">
-              Move<br />
-              <span className="text-bw-gold">Different</span>
+              EQUIPAMIENTO<br />
+              <span className="text-bw-gold">ALPHA</span>
             </h1>
 
             <p className="font-body text-base md:text-lg text-bw-warm/80 mt-6 max-w-md leading-relaxed">
-              Equipamiento técnico premium para humanos y mascotas. Donde la innovación se encuentra con el territorio.
+              Herramientas técnicas diseñadas para la supervivencia urbana y la exploración sin límites. BlackWolf fusiona la resistencia para mascotas con la funcionalidad para humanos en una sola visión: equipar a la manada entera.
             </p>
 
             <div className="flex items-center gap-4 mt-10">
@@ -166,14 +166,14 @@ export default function HomePage() {
           <div>
             <SectionLabel>Nuestra filosofía</SectionLabel>
             <h2 className="font-display font-bold text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.95] tracking-tight">
-              Built for<br />
-              <span className="text-bw-gold">real life</span>
+              Evolución<br />
+              <span className="text-bw-gold">Sinérgica</span>
             </h2>
             <p className="font-body text-base text-bw-warm/70 mt-8 leading-relaxed max-w-lg">
-              BlackWolf nació de una convicción simple: el equipamiento técnico no debería elegir entre rendimiento y diseño. Cada producto es el resultado de años de investigación en campo.
+              BlackWolf nació de una convicción simple: el equipamiento técnico no debería elegir entre rendimiento y diseño, ni para ti ni para tu mascota. Cada producto es el resultado de años de investigación en campo, uniendo la resistencia estructural con la ergonomía avanzada.
             </p>
             <p className="font-body text-base text-bw-warm/50 mt-4 leading-relaxed max-w-lg">
-              Desde el asfalto de la ciudad hasta los senderos más exigentes, nos movemos contigo.
+              Desde el asfalto de la ciudad hasta los senderos más exigentes, somos una marca que entiende que el crecimiento se logra trabajando en equipo. Nos movemos contigo, te equipamos para liderar.
             </p>
             <Link
               href="/products"
@@ -186,8 +186,8 @@ export default function HomePage() {
           <div className="relative">
             <div className="aspect-[4/5] rounded-apple-xl overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=600&q=70"
-                alt="Aventura BlackWolf"
+                src="https://images.unsplash.com/photo-1584066049506-55caa521d2d3?w=600&q=70"
+                alt="BlackWolf - Evolución Sinérgica"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -204,7 +204,7 @@ export default function HomePage() {
               Por qué<br />BlackWolf
             </h2>
             <p className="font-body text-base text-bw-warm/60 leading-relaxed self-end max-w-md">
-              Tecnología avanzada, materiales de ingeniería y un diseño pensado para cada condición. No hacemos compromisos.
+              Diseñamos herramientas para los que lideran el camino, no para los que lo siguen. Nuestra tecnología está probada en las condiciones más duras para asegurar que tu equipo nunca sea el eslabón débil de la manada.
             </p>
           </div>
 
@@ -322,8 +322,8 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2">
           <div className="relative aspect-square md:aspect-auto">
             <img
-              src="https://images.unsplash.com/photo-1468818438311-4bab781ab9b8?w=600&q=70"
-              alt="BlackWolf Lifestyle"
+              src="https://images.unsplash.com/photo-1535008652995-e95986556e32?w=600&q=70"
+              alt="BlackWolf - Únete a la Manada"
               className="w-full h-full object-cover"
             />
           </div>
@@ -331,11 +331,11 @@ export default function HomePage() {
             <div className="max-w-md">
               <SectionLabel>Comunidad</SectionLabel>
               <h2 className="font-display font-bold text-[clamp(2.5rem,4vw,4rem)] leading-[0.95] tracking-tight text-bw-black">
-                Join<br />
-                <span className="text-bw-brown">the pack</span>
+                Únete a<br />
+                <span className="text-bw-brown">la Manada</span>
               </h2>
               <p className="font-body text-base text-bw-brown/70 mt-6 leading-relaxed">
-                Una comunidad de aventureros que no hace concesiones. Comparte rutas, experiencias y el mismo compromiso con lo que los mueve.
+                Somos más que equipamiento; somos una comunidad de aventureros y líderes que no hacen concesiones. Comparte rutas, experiencias y el mismo compromiso con el crecimiento y la exploración.
               </p>
               <button className="mt-10 px-8 py-3.5 bg-bw-black text-bw-cream font-display font-bold text-xs uppercase tracking-[0.15em] rounded-full hover:bg-bw-dark transition-colors duration-300">
                 Unirse ahora
@@ -384,6 +384,15 @@ export default function HomePage() {
 
       {/* ─── MANIFESTO ─── */}
       <Section className="relative py-48 md:py-60 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1745139755847-2883e6c746e2?w=800&q=70"
+            alt="BlackWolf - Movimiento en Sinergia"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-bw-black/80" />
+        </div>
         {/* Watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
           <span className="font-display font-bold text-[22vw] uppercase tracking-tighter text-bw-gold/[0.04] whitespace-nowrap">
@@ -393,11 +402,11 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
           <h2 className="font-display font-bold text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.95] tracking-tight">
-            Built for<br />
-            <span className="text-bw-gold">movement</span>
+            Movimiento en<br />
+            <span className="text-bw-gold">Sinergia</span>
           </h2>
           <p className="font-body text-base text-bw-warm/60 mt-8 leading-relaxed max-w-lg mx-auto">
-            BlackWolf diseña herramientas para la vida diaria. Movimiento, adaptación y evolución constante en cada producto.
+            BlackWolf diseña herramientas para la vida diaria de la manada entera. Movimiento constante, adaptación táctica y evolución compartida en cada producto. No fabricamos accesorios descartables; creamos equipo para que tú y tu compañero podáis liderar vuestro propio camino.
           </p>
           <div className="flex items-center justify-center gap-4 mt-12">
             <Link
