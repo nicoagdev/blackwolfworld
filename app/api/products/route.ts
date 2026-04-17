@@ -22,16 +22,15 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const slug = searchParams.get('slug');
 
-        let url = `${API_URL}/wp-json/wc/v3/products`;
-        if (slug) {
-            url += `?slug=${slug}`;
-        }
+        const url = `${API_URL}/wp-json/wc/v3/products`;
 
         const response = await axios.get(url, {
-            params: {
-                consumer_key: CONSUMER_KEY,
-                consumer_secret: CONSUMER_SECRET,
+            auth: {
+                username: CONSUMER_KEY!,
+                password: CONSUMER_SECRET!,
             },
+            params: slug ? { slug } : undefined,
+            timeout: 15000,
         });
         return NextResponse.json(response.data);
     } catch (error: any) {
