@@ -4,12 +4,35 @@ import '../styles/shadcn.css';
 import '../app/globals.css';
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import type { Metadata } from 'next';
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-export const metadata = {
-  title: 'BlackWolf — Move Different',
-  description: 'Equipamiento técnico premium para humanos y mascotas',
+export const metadata: Metadata = {
+  metadataBase: new URL('https://blackwolfworld.com'),
+  title: 'Accesorios para Mascotas y Humanos en Villa Gesell',
+  description: 'Encontrá collares, pretales y accesorios para perros, gatos y vos. Calidad artesanal y los mejores regalos en Villa Gesell. ¡Comprá online hoy mismo! 🌊',
+  openGraph: {
+    type: 'website',
+    locale: 'es_AR',
+    siteName: 'BlackWolf',
+    title: 'Accesorios para Mascotas y Humanos en Villa Gesell',
+    description: 'Encontrá collares, pretales y accesorios para perros, gatos y vos. Calidad artesanal y los mejores regalos en Villa Gesell. ¡Comprá online hoy mismo! 🌊',
+    images: [
+      {
+        url: '/imagenes/blackwolfgesell.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'BlackWolf — Accesorios para Mascotas y Humanos en Villa Gesell',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Accesorios para Mascotas y Humanos en Villa Gesell',
+    description: 'Encontrá collares, pretales y accesorios para perros, gatos y vos. Calidad artesanal y los mejores regalos en Villa Gesell. ¡Comprá online hoy mismo! 🌊',
+    images: ['/imagenes/blackwolfgesell.jpg'],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
