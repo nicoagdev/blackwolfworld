@@ -102,12 +102,16 @@ export default function HomePage() {
       <section className="relative h-svh min-h-[580px] md:min-h-[680px] flex items-end">
         {/* Background */}
         <div className="absolute inset-0 -z-0">
-          <img
-            src="https://images.unsplash.com/photo-1589557933842-a32866d4ec23?w=800&q=70"
-            alt="BlackWolf - Equipamiento Alpha"
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="https://images.unsplash.com/photo-1589557933842-a32866d4ec23?w=800&q=70"
             className="w-full h-full object-cover"
-            loading="eager"
-          />
+          >
+            <source src="https://videos.pexels.com/video-files/36746540/15573192_1920_1080_50fps.mp4" type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-r from-bw-black via-bw-black/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-bw-black via-transparent to-transparent" />
         </div>
