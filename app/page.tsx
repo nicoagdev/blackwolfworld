@@ -7,6 +7,9 @@ import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { ArrowRight, Shield, Radio, Eye, ChevronRight } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import useProducts from '@/hooks/useProducts';
+import useCart from '@/hooks/useCart';
+import { Product } from '@/types/product';
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -59,37 +62,7 @@ const features = [
   },
 ];
 
-const hardcodedProducts = [
-  {
-    image: 'https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=800&q=80',
-    tag: 'Nuevo',
-    name: 'GPS Pro Tracker',
-    desc: 'Rastreo profesional para mascotas y aventureros',
-    price: '$89.900',
-    large: true,
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1601445638532-1f6bf03a3500?w=600&q=80',
-    tag: 'Top ventas',
-    name: 'Collar Táctico',
-    desc: '',
-    price: '$34.500',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=600&q=80',
-    tag: '',
-    name: 'Mochila Urban 28L',
-    desc: '',
-    price: '$67.000',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1567456225042-4e038a4ef3f2?w=600&q=80',
-    tag: 'Promo',
-    name: 'Kit Aventura Pro',
-    desc: '',
-    price: '$124.000',
-  },
-];
+
 
 const testimonials = [
   {
@@ -127,6 +100,14 @@ export default function HomePage() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+
+  const { allProducts, loading: productsLoading } = useProducts();
+  const { addToCart } = useCart();
+  const featuredProducts = allProducts.slice(0, 4);
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({ ...product, quantity: 1 });
+  };
 
   return (
     <main className="bg-bw-black text-bw-cream overflow-x-hidden">
@@ -280,46 +261,60 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {hardcodedProducts.map((p, i) => (
-              <div
-                key={i}
-                className={`group relative bg-bw-dark rounded-apple-xl overflow-hidden ${
-                  i === 0 ? 'col-span-2 row-span-2' : ''
-                }`}
-              >
-                <div className={`relative ${i === 0 ? 'aspect-square' : 'aspect-[3/4]'} overflow-hidden`}>
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bw-black/80 via-transparent to-transparent" />
-                </div>
-
-                {p.tag && (
-                  <span className="absolute top-4 left-4 px-3 py-1 bg-bw-gold/90 text-bw-black font-display text-[0.6rem] font-bold uppercase tracking-widest rounded-full">
-                    {p.tag}
-                  </span>
-                )}
-
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-                  <h3 className={`font-display font-bold uppercase tracking-wide text-bw-cream ${i === 0 ? 'text-xl' : 'text-sm'}`}>
-                    {p.name}
-                  </h3>
-                  {p.desc && (
-                    <p className="font-body text-xs text-bw-warm/50 mt-1">{p.desc}</p>
-                  )}
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="font-serif text-lg text-bw-gold">{p.price}</span>
-                    <button className="px-4 py-2 border border-white/10 rounded-full font-display text-[0.6rem] font-bold uppercase tracking-widest text-bw-cream/70 hover:border-bw-gold hover:text-bw-gold transition-all duration-300">
-                      Agregar
-                    </button>
+          {productsLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-2 border-bw-gold/20 border-t-bw-gold rounded-full animate-spin" />
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <p className="font-body text-sm text-bw-muted text-center py-20">No hay productos disponibles aún.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {featuredProducts.map((p, i) => (
+                <Link
+                  key={p.id}
+                  href={`/products/${p.slug}`}
+                  className={`group relative bg-bw-dark rounded-apple-xl overflow-hidden ${
+                    i === 0 ? 'col-span-2 row-span-2' : ''
+                  }`}
+                >
+                  <div className={`relative ${i === 0 ? 'aspect-square' : 'aspect-[3/4]'} overflow-hidden`}>
+                    <img
+                      src={p.images?.[0]?.src || '/imagenes/hero.jpg'}
+                      alt={p.images?.[0]?.alt || p.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bw-black/80 via-transparent to-transparent" />
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+
+                  {p.sale_price && (
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-bw-gold/90 text-bw-black font-display text-[0.6rem] font-bold uppercase tracking-widest rounded-full">
+                      Promo
+                    </span>
+                  )}
+
+                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                    <h3 className={`font-display font-bold uppercase tracking-wide text-bw-cream ${i === 0 ? 'text-xl' : 'text-sm'}`}>
+                      {p.name}
+                    </h3>
+                    {i === 0 && p.categories?.[0] && (
+                      <p className="font-body text-xs text-bw-warm/50 mt-1">{p.categories[0].name}</p>
+                    )}
+                    <div className="flex items-center justify-between mt-3">
+                      <span className="font-serif text-lg text-bw-gold">
+                        ${parseFloat(p.price).toLocaleString()}
+                      </span>
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(p); }}
+                        className="px-4 py-2 border border-white/10 rounded-full font-display text-[0.6rem] font-bold uppercase tracking-widest text-bw-cream/70 hover:border-bw-gold hover:text-bw-gold transition-all duration-300"
+                      >
+                        Agregar
+                      </button>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
           <Link
             href="/products"
