@@ -168,8 +168,11 @@ export default function HomePage() {
 
       {/* ─── BAND ─── */}
       <div className="bg-bw-gold py-3 overflow-hidden">
-        <div className="flex items-center gap-8 animate-[scroll_20s_linear_infinite] whitespace-nowrap">
-          {[...bandItems, ...bandItems].map((item, i) => (
+        <div
+          className="flex items-center gap-8 whitespace-nowrap"
+          style={{ animation: 'scroll 20s linear infinite', width: 'max-content' }}
+        >
+          {[...bandItems, ...bandItems, ...bandItems].map((item, i) => (
             <span key={i} className="flex items-center gap-3 font-display text-[0.65rem] font-bold uppercase tracking-[0.2em] text-bw-black">
               <span className="w-1 h-1 rounded-full bg-bw-black/40" />
               {item}
