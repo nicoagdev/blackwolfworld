@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* BlackWolf × Apple — Dark luxury theme */
+    --background: 30 11% 4%;
+    --foreground: 34 30% 92%;
+    --card: 32 10% 8%;
+    --card-foreground: 34 30% 92%;
+    --popover: 32 10% 8%;
+    --popover-foreground: 34 30% 92%;
+    --primary: 38 40% 60%;
+    --primary-foreground: 30 11% 4%;
+    --secondary: 32 8% 12%;
+    --secondary-foreground: 34 30% 92%;
+    --muted: 32 8% 12%;
+    --muted-foreground: 30 6% 56%;
+    --accent: 38 40% 60%;
+    --accent-foreground: 30 11% 4%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 34 30% 92%;
+    --border: 35 12% 14%;
+    --input: 35 12% 14%;
+    --ring: 38 40% 60%;
+    --chart-1: 38 40% 60%;
+    --chart-2: 32 25% 45%;
+    --chart-3: 30 6% 56%;
+    --chart-4: 34 30% 80%;
+    --chart-5: 35 50% 70%;
+    --radius: 1rem;
+
+    /* BlackWolf brand tokens */
+    --bw-black: #0C0B09;
+    --bw-gold: #C8A96E;
+    --bw-gold-light: #D4B87A;
+    --bw-cream: #F5F0E8;
+    --bw-warm: #E8E0D4;
+    --bw-brown: #7D6A52;
+    --bw-muted: #9A9288;
+    --bw-dark: #1A1814;
+    --bw-dark-hover: #2E2B26;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  ::selection {
+    background: rgba(200, 169, 110, 0.3);
+    color: #F5F0E8;
+  }
+}

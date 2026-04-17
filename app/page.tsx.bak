@@ -1,0 +1,1082 @@
+'use client';
+
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  images: Array<{ src: string }>;
+}
+
+export default function HomePage() {
+  const [scrolled, setScrolled] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 60);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        const data = await response.json();
+        setProducts(data.slice(0, 4));
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), 80);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    reveals.forEach((el) => observer.observe(el));
+  }, []);
+
+  return (
+    <main style={{ backgroundColor: '#0C0B09', color: '#F0EAE0', overflowX: 'hidden' }}>
+
+      {/* NAV */}
+      <style>{`
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+        img { display: block; width: 100%; object-fit: cover; }
+        a { color: inherit; text-decoration: none; }
+
+        nav {
+          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 1.25rem 3rem;
+          transition: background 0.4s, backdrop-filter 0.4s;
+        }
+        nav.scrolled {
+          background: rgba(12,11,9,0.85);
+          backdrop-filter: blur(12px);
+          border-bottom: 0.5px solid rgba(200,169,110,0.15);
+        }
+        .nav-logo {
+          height: 40px;
+          width: auto;
+          max-width: 120px;
+          object-fit: contain;
+        }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links a {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 400;
+          font-size: 0.85rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #E8E0D4;
+          opacity: 0.75;
+          transition: opacity 0.2s, color 0.2s;
+        }
+        .nav-links a:hover { opacity: 1; color: #C8A96E; }
+        .nav-cta {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 600;
+          font-size: 0.82rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #0C0B09 !important;
+          background: #C8A96E;
+          opacity: 1 !important;
+          padding: 0.55rem 1.5rem;
+          border-radius: 2px;
+          transition: background 0.2s;
+        }
+        .nav-cta:hover { background: #D4B87A !important; }
+
+        .hero {
+          position: relative;
+          height: 100svh;
+          min-height: 680px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          overflow: hidden;
+        }
+        .hero-img { grid-column: 1 / -1; grid-row: 1; position: absolute; inset: 0; }
+        .hero-img::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: linear-gradient(to right, rgba(12,11,9,0.85) 0%, rgba(12,11,9,0.55) 45%, rgba(12,11,9,0.15) 100%);
+        }
+        .hero-img img { height: 100%; object-position: center 30%; }
+        .hero-content {
+          position: relative; z-index: 2;
+          grid-column: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          padding: 0 4rem 7rem 4rem;
+          max-width: 660px;
+        }
+        .hero-label {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 400;
+          font-size: 0.78rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #C8A96E;
+          margin-bottom: 1.2rem;
+          animation: fadeUp 0.7s 0.3s forwards;
+        }
+        .hero-title {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(5rem, 11vw, 9.5rem);
+          line-height: 0.92;
+          text-transform: uppercase;
+          color: #F5F0E8;
+          margin-bottom: 1.8rem;
+          animation: fadeUp 0.8s 0.5s forwards;
+        }
+        .hero-title em { color: #C8A96E; font-style: italic; }
+        .hero-sub {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 1.1rem;
+          line-height: 1.65;
+          color: #E8E0D4;
+          opacity: 0.8;
+          max-width: 400px;
+          margin-bottom: 2.8rem;
+          animation: fadeUp 0.8s 0.7s forwards;
+        }
+        .hero-actions {
+          display: flex; gap: 1rem; align-items: center;
+          animation: fadeUp 0.8s 0.9s forwards;
+        }
+        .btn-primary {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 0.88rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          background: #C8A96E;
+          color: #0C0B09;
+          padding: 1rem 2.5rem;
+          border-radius: 2px;
+          border: none;
+          cursor: pointer;
+          transition: background 0.2s, transform 0.15s;
+        }
+        .btn-primary:hover { background: #D4B87A; transform: translateY(-1px); }
+        .btn-ghost {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 400;
+          font-size: 0.85rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #E8E0D4;
+          border-bottom: 1px solid rgba(200,169,110,0.4);
+          padding-bottom: 2px;
+          transition: color 0.2s, border-color 0.2s;
+        }
+        .btn-ghost:hover { color: #C8A96E; border-color: #C8A96E; }
+
+        .band {
+          background: #C8A96E;
+          padding: 1.1rem 4rem;
+          display: flex; gap: 3rem; align-items: center;
+          overflow: hidden;
+        }
+        .band-item {
+          display: flex; align-items: center; gap: 0.75rem;
+          white-space: nowrap;
+        }
+        .band-dot { width: 4px; height: 4px; border-radius: 50%; background: #0C0B09; flex-shrink: 0; }
+        .band-text {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 600;
+          font-size: 0.82rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #0C0B09;
+        }
+
+        .narrative {
+          padding: 9rem 4rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6rem;
+          align-items: center;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+        .section-label {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 400;
+          font-size: 0.75rem;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #C8A96E;
+          margin-bottom: 1.5rem;
+          display: flex; align-items: center; gap: 1rem;
+        }
+        .section-label::before {
+          content: ''; display: block;
+          width: 32px; height: 1px; background: #C8A96E;
+        }
+        .narrative h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(3rem, 5vw, 5.5rem);
+          line-height: 0.95;
+          text-transform: uppercase;
+          color: #F5F0E8;
+          margin-bottom: 2rem;
+        }
+        .narrative h2 em { color: #C8A96E; display: block; }
+        .narrative p {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 1.05rem;
+          line-height: 1.75;
+          color: #9A9288;
+          max-width: 420px;
+          margin-bottom: 2.5rem;
+        }
+        .narrative-img-wrap {
+          position: relative;
+          aspect-ratio: 4/5;
+          overflow: hidden;
+          border-radius: 2px;
+        }
+        .narrative-img-wrap img {
+          height: 100%;
+          transition: transform 0.8s ease;
+        }
+        .narrative-img-wrap:hover img { transform: scale(1.04); }
+        .narrative-img-accent {
+          position: absolute;
+          bottom: -1.5rem;
+          left: -1.5rem;
+          width: 45%;
+          aspect-ratio: 1;
+          border: 1px solid rgba(200,169,110,0.25);
+          border-radius: 2px;
+        }
+
+        .features {
+          background: #1A1814;
+          padding: 7rem 4rem;
+        }
+        .features-inner {
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+        .features-header {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          margin-bottom: 5rem;
+          align-items: end;
+        }
+        .features-header h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(2.5rem, 4vw, 4.5rem);
+          line-height: 0.95;
+          text-transform: uppercase;
+          color: #F5F0E8;
+        }
+        .features-header p {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 1rem;
+          line-height: 1.7;
+          color: #9A9288;
+        }
+        .features-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5px;
+          background: rgba(200,169,110,0.12);
+        }
+        .feature-card {
+          background: #1A1814;
+          padding: 2.75rem 2.5rem;
+          transition: background 0.25s;
+        }
+        .feature-card:hover { background: #2E2B26; }
+        .feature-num {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 300;
+          font-size: 0.75rem;
+          letter-spacing: 0.18em;
+          color: #C8A96E;
+          margin-bottom: 2rem;
+        }
+        .feature-icon {
+          width: 40px; height: 40px;
+          margin-bottom: 1.5rem;
+          opacity: 0.7;
+        }
+        .feature-card h3 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 1.55rem;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          color: #F5F0E8;
+          margin-bottom: 1rem;
+        }
+        .feature-card p {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 0.92rem;
+          line-height: 1.7;
+          color: #9A9288;
+        }
+
+        .products {
+          padding: 8rem 4rem;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+        .products-header {
+          display: flex; justify-content: space-between; align-items: flex-end;
+          margin-bottom: 4rem;
+        }
+        .products-header h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(2.5rem, 4vw, 4rem);
+          text-transform: uppercase;
+          color: #F5F0E8;
+          line-height: 0.95;
+        }
+        .products-header a {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 400;
+          font-size: 0.82rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #C8A96E;
+          display: flex; align-items: center; gap: 8px;
+          border-bottom: 1px solid rgba(200,169,110,0.3);
+          padding-bottom: 2px;
+          transition: gap 0.2s;
+        }
+        .products-header a:hover { gap: 14px; }
+        .products-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1px;
+          background: rgba(200,169,110,0.1);
+        }
+        .product-card {
+          background: #0C0B09;
+          overflow: hidden;
+          cursor: pointer;
+          transition: background 0.25s;
+        }
+        .product-card:hover { background: #1A1814; }
+        .product-card:first-child {
+          grid-column: span 2;
+          grid-row: span 2;
+        }
+        .product-img {
+          position: relative;
+          overflow: hidden;
+        }
+        .product-card:first-child .product-img { aspect-ratio: 1; }
+        .product-card:not(:first-child) .product-img { aspect-ratio: 3/2; }
+        .product-img img {
+          height: 100%;
+          transition: transform 0.6s ease;
+        }
+        .product-card:hover .product-img img { transform: scale(1.04); }
+        .product-tag {
+          position: absolute; top: 1rem; left: 1rem;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 600;
+          font-size: 0.7rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          background: #C8A96E;
+          color: #0C0B09;
+          padding: 0.3rem 0.8rem;
+          border-radius: 1px;
+        }
+        .product-info { padding: 1.5rem 1.75rem 2rem; }
+        .product-info h4 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 1.15rem;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: #F5F0E8;
+          margin-bottom: 0.4rem;
+        }
+        .product-card:first-child .product-info h4 { font-size: 1.5rem; }
+        .product-meta {
+          display: flex; justify-content: space-between; align-items: center;
+          margin-top: 0.75rem;
+        }
+        .product-price {
+          font-family: 'Fraunces', serif;
+          font-size: 1.1rem;
+          color: #C8A96E;
+        }
+        .product-add {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 600;
+          font-size: 0.72rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #9A9288;
+          border: 0.5px solid rgba(200,169,110,0.25);
+          padding: 0.45rem 1rem;
+          border-radius: 1px;
+          transition: color 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .product-card:hover .product-add {
+          color: #0C0B09;
+          background: #C8A96E;
+          border-color: #C8A96E;
+        }
+
+        .split {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          min-height: 600px;
+        }
+        .split-img {
+          position: relative;
+          overflow: hidden;
+        }
+        .split-img img {
+          height: 100%;
+          transition: transform 0.8s ease;
+        }
+        .split:hover .split-img img { transform: scale(1.03); }
+        .split-content {
+          background: #F5F0E8;
+          padding: 6rem 5rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .split-content .section-label { color: #7D6A52; }
+        .split-content .section-label::before { background: #7D6A52; }
+        .split-content h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(2.8rem, 4.5vw, 5rem);
+          line-height: 0.92;
+          text-transform: uppercase;
+          color: #0C0B09;
+          margin-bottom: 1.8rem;
+        }
+        .split-content h2 em { color: #7D6A52; }
+        .split-content p {
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          font-size: 1rem;
+          line-height: 1.75;
+          color: #7D6A52;
+          max-width: 380px;
+          margin-bottom: 2.5rem;
+        }
+        .btn-dark {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 0.85rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          background: #0C0B09;
+          color: #F5F0E8;
+          padding: 1rem 2.5rem;
+          border-radius: 2px;
+          display: inline-block;
+          transition: background 0.2s, transform 0.15s;
+          align-self: flex-start;
+        }
+        .btn-dark:hover { background: #2E2B26; transform: translateY(-1px); }
+
+        .testimonials {
+          padding: 8rem 4rem;
+          background: #1A1814;
+        }
+        .testimonials-inner { max-width: 1400px; margin: 0 auto; }
+        .testimonials h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(2.5rem, 4vw, 4rem);
+          text-transform: uppercase;
+          color: #F5F0E8;
+          margin-bottom: 4rem;
+          line-height: 0.95;
+        }
+        .testimonials-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1px;
+          background: rgba(200,169,110,0.12);
+        }
+        .testimonial {
+          background: #1A1814;
+          padding: 2.5rem;
+        }
+        .t-quote {
+          font-family: 'Fraunces', serif;
+          font-style: italic;
+          font-size: 1.05rem;
+          line-height: 1.75;
+          color: #E8E0D4;
+          margin-bottom: 2rem;
+          position: relative;
+        }
+        .t-quote::before {
+          content: '"';
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 5rem;
+          line-height: 1;
+          color: rgba(200,169,110,0.15);
+          position: absolute;
+          top: -1rem; left: -0.5rem;
+          pointer-events: none;
+        }
+        .t-author {
+          display: flex; align-items: center; gap: 1rem;
+        }
+        .t-avatar {
+          width: 36px; height: 36px;
+          border-radius: 50%;
+          background: #7D6A52;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 0.8rem;
+          letter-spacing: 0.05em;
+          color: #F5F0E8;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .t-name {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 600;
+          font-size: 0.88rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #F5F0E8;
+        }
+        .t-role {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.78rem;
+          color: #9A9288;
+          margin-top: 1px;
+        }
+
+        .manifesto {
+          padding: 12rem 4rem;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+        .manifesto::before {
+          content: 'BLACKWOLF';
+          position: absolute;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-size: 22vw;
+          color: rgba(200,169,110,0.04);
+          top: 50%; left: 50%;
+          transform: translate(-50%,-50%);
+          white-space: nowrap;
+          pointer-events: none;
+          letter-spacing: -0.02em;
+        }
+        .manifesto-inner {
+          position: relative; z-index: 1;
+          max-width: 900px; margin: 0 auto;
+        }
+        .manifesto h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(3.5rem, 7vw, 8rem);
+          line-height: 0.9;
+          text-transform: uppercase;
+          color: #F5F0E8;
+          margin-bottom: 2.5rem;
+        }
+        .manifesto h2 em { color: #C8A96E; display: block; }
+        .manifesto p {
+          font-family: 'Fraunces', serif;
+          font-style: italic;
+          font-size: 1.2rem;
+          line-height: 1.8;
+          color: #9A9288;
+          max-width: 580px;
+          margin: 0 auto 3.5rem;
+        }
+        .manifesto-actions { display: flex; gap: 1.25rem; justify-content: center; }
+
+        .newsletter {
+          background: #F5F0E8;
+          padding: 6rem 4rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 5rem;
+          align-items: center;
+        }
+        .newsletter-text .section-label { color: #7D6A52; }
+        .newsletter-text .section-label::before { background: #7D6A52; }
+        .newsletter-text h2 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 900;
+          font-style: italic;
+          font-size: clamp(2rem, 3.5vw, 3.5rem);
+          text-transform: uppercase;
+          color: #0C0B09;
+          line-height: 0.95;
+        }
+        .newsletter-form { display: flex; flex-direction: column; gap: 1rem; }
+        .newsletter-form p {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.88rem;
+          color: #7D6A52;
+          line-height: 1.6;
+        }
+        .nl-input-row { display: flex; gap: 0; }
+        .nl-input-row input {
+          flex: 1;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.92rem;
+          padding: 0.95rem 1.5rem;
+          background: white;
+          border: 1px solid rgba(125,106,82,0.25);
+          border-right: none;
+          border-radius: 2px 0 0 2px;
+          color: #0C0B09;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        .nl-input-row input::placeholder { color: #7D6A52; opacity: 0.6; }
+        .nl-input-row input:focus { border-color: #7D6A52; }
+        .nl-input-row button {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 0.82rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          background: #0C0B09;
+          color: #F5F0E8;
+          padding: 0.95rem 2rem;
+          border: none;
+          border-radius: 0 2px 2px 0;
+          cursor: pointer;
+          transition: background 0.2s;
+          white-space: nowrap;
+        }
+        .nl-input-row button:hover { background: #2E2B26; }
+
+        footer {
+          background: #0C0B09;
+          border-top: 0.5px solid rgba(200,169,110,0.12);
+          padding: 4rem 4rem 2.5rem;
+        }
+        .footer-top {
+          display: grid;
+          grid-template-columns: 2fr 1fr 1fr 1fr;
+          gap: 4rem;
+          margin-bottom: 4rem;
+          padding-bottom: 4rem;
+          border-bottom: 0.5px solid rgba(200,169,110,0.1);
+        }
+        .footer-brand .nav-logo { height: 45px; width: auto; max-width: 140px; object-fit: contain; display: block; margin-bottom: 1rem; }
+        .footer-brand p {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.88rem;
+          line-height: 1.65;
+          color: #9A9288;
+          max-width: 260px;
+        }
+        .footer-col h5 {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 600;
+          font-size: 0.75rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #C8A96E;
+          margin-bottom: 1.5rem;
+        }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+        .footer-col ul li a {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.88rem;
+          color: #9A9288;
+          transition: color 0.2s;
+        }
+        .footer-col ul li a:hover { color: #E8E0D4; }
+        .footer-bottom {
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-bottom p {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.78rem;
+          color: #9A9288;
+        }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+          opacity: 0;
+          transform: translateY(32px);
+          transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+          nav { padding: 1.25rem 2rem; }
+          .hero-content { padding: 0 2.5rem 6rem; }
+          .narrative { grid-template-columns: 1fr; padding: 6rem 2.5rem; gap: 4rem; }
+          .narrative-img-wrap { max-width: 500px; }
+          .features { padding: 5rem 2.5rem; }
+          .features-header { grid-template-columns: 1fr; gap: 1.5rem; }
+          .features-grid { grid-template-columns: 1fr; }
+          .products { padding: 6rem 2.5rem; }
+          .products-grid { grid-template-columns: 1fr 1fr; }
+          .product-card:first-child { grid-column: span 2; grid-row: span 1; }
+          .split { grid-template-columns: 1fr; }
+          .split-img { aspect-ratio: 16/9; }
+          .split-content { padding: 4rem 2.5rem; }
+          .testimonials { padding: 6rem 2.5rem; }
+          .testimonials-grid { grid-template-columns: 1fr; }
+          .newsletter { grid-template-columns: 1fr; padding: 5rem 2.5rem; gap: 3rem; }
+          .manifesto { padding: 8rem 2.5rem; }
+          .footer-top { grid-template-columns: 1fr 1fr; gap: 3rem; }
+          .band { padding: 1.1rem 2.5rem; gap: 2rem; }
+        }
+
+        @media (max-width: 640px) {
+          .nav-links { display: none; }
+          .hero-title { font-size: clamp(3.5rem, 17vw, 7rem); }
+          .hero-content { padding: 0 1.5rem 5rem; }
+          .manifesto-actions { flex-direction: column; align-items: center; }
+          .footer-top { grid-template-columns: 1fr; }
+          .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+      `}</style>
+
+      <nav id="nav">
+        <img src="/logos/Logo-Blackwolf-Light.png" alt="BlackWolf" className="nav-logo" />
+        <div className="nav-links">
+          <a href="#">Tienda</a>
+          <a href="#">Colecciones</a>
+          <a href="#">Tecnología</a>
+          <a href="#">Nosotros</a>
+          <a href="#" className="nav-cta">Explorar</a>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-img">
+          <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=1800&q=80" alt="BlackWolf aventura"/>
+        </div>
+        <div className="hero-content">
+          <p className="hero-label">Nueva colección 2025</p>
+          <h1 className="hero-title">Move<br/><em>Different</em></h1>
+          <p className="hero-sub">Equipamiento técnico premium para humanos y mascotas. Donde la innovación se encuentra con el territorio.</p>
+          <div className="hero-actions">
+            <Link href="/store" className="btn-primary">Ver colección</Link>
+            <a href="#" className="btn-ghost">Nuestra historia →</a>
+          </div>
+        </div>
+      </section>
+
+      {/* BAND */}
+      <div className="band">
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">Envío gratis +$50.000</span></div>
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">Garantía 2 años</span></div>
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">Devolución 30 días</span></div>
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">GPS integrado</span></div>
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">Tecnología premium</span></div>
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">Envío gratis +$50.000</span></div>
+        <div className="band-item"><div className="band-dot"></div><span className="band-text">Garantía 2 años</span></div>
+      </div>
+
+      {/* NARRATIVE */}
+      <section className="narrative">
+        <div className="narrative-text reveal">
+          <div className="section-label">Nuestra filosofía</div>
+          <h2>Built for<br/><em>real life</em></h2>
+          <p>BlackWolf nació de una convicción simple: el equipamiento técnico no debería elegir entre rendimiento y diseño. Cada producto es el resultado de años de investigación en campo.</p>
+          <p>Desde el asfalto de la ciudad hasta los senderos más exigentes, nos movemos contigo.</p>
+          <Link href="#" className="btn-primary">Conocer más</Link>
+        </div>
+        <div className="narrative-img-wrap reveal">
+          <img src="https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=900&q=80" alt="Aventura BlackWolf"/>
+          <div className="narrative-img-accent"></div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="features">
+        <div className="features-inner">
+          <div className="features-header reveal">
+            <h2>Por qué<br/>BlackWolf</h2>
+            <p>Tecnología avanzada, materiales de ingeniería y un diseño pensado para cada condición. No hacemos compromesos.</p>
+          </div>
+          <div className="features-grid">
+            <div className="feature-card reveal">
+              <div className="feature-num">01</div>
+              <svg className="feature-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 4L6 10V22C6 29.7 12.4 36.8 20 38C27.6 36.8 34 29.7 34 22V10L20 4Z" stroke="#C8A96E" strokeWidth="1.5" strokeLinejoin="round"/>
+              </svg>
+              <h3>Durabilidad extrema</h3>
+              <p>Materiales resistentes a impactos, agua y desgaste. Certificados para las condiciones más exigentes del terreno.</p>
+            </div>
+            <div className="feature-card reveal">
+              <div className="feature-num">02</div>
+              <svg className="feature-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="14" stroke="#C8A96E" strokeWidth="1.5"/>
+                <path d="M20 8V20L28 26" stroke="#C8A96E" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <h3>GPS en tiempo real</h3>
+              <p>Rastreo preciso con actualización cada 10 segundos. Compatible con iOS y Android sin suscripción adicional.</p>
+            </div>
+            <div className="feature-card reveal">
+              <div className="feature-num">03</div>
+              <svg className="feature-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 20C8 20 12 10 20 10C28 10 32 20 32 20C32 20 28 30 20 30C12 30 8 20 8 20Z" stroke="#C8A96E" strokeWidth="1.5"/>
+                <circle cx="20" cy="20" r="4" stroke="#C8A96E" strokeWidth="1.5"/>
+              </svg>
+              <h3>Diseño ergonómico</h3>
+              <p>Formas estudiadas para máxima comodidad en movimiento. Probadas por más de 500 horas en campo antes del lanzamiento.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUCTS */}
+      <section className="products">
+        <div className="products-header reveal">
+          <h2>Selección<br/>destacada</h2>
+          <a href="#">Ver toda la colección →</a>
+        </div>
+        <div className="products-grid">
+          <div className="product-card reveal">
+            <div className="product-img">
+              <img src="https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=800&q=80" alt="GPS Pro Tracker"/>
+              <span className="product-tag">Nuevo</span>
+            </div>
+            <div className="product-info">
+              <h4>GPS Pro Tracker</h4>
+              <p style={{fontSize:'0.85rem',color:'#9A9288',marginTop:'0.3rem',fontFamily:'DM Sans',fontWeight:'300'}}>Rastreo profesional para mascotas y aventureros</p>
+              <div className="product-meta">
+                <span className="product-price">$89.900</span>
+                <span className="product-add">Agregar</span>
+              </div>
+            </div>
+          </div>
+          <div className="product-card reveal">
+            <div className="product-img">
+              <img src="https://images.unsplash.com/photo-1601445638532-1f6bf03a3500?w=600&q=80" alt="Collar Táctico"/>
+              <span className="product-tag">Top ventas</span>
+            </div>
+            <div className="product-info">
+              <h4>Collar Táctico</h4>
+              <div className="product-meta">
+                <span className="product-price">$34.500</span>
+                <span className="product-add">Agregar</span>
+              </div>
+            </div>
+          </div>
+          <div className="product-card reveal">
+            <div className="product-img">
+              <img src="https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=600&q=80" alt="Mochila Urban"/>
+            </div>
+            <div className="product-info">
+              <h4>Mochila Urban 28L</h4>
+              <div className="product-meta">
+                <span className="product-price">$67.000</span>
+                <span className="product-add">Agregar</span>
+              </div>
+            </div>
+          </div>
+          <div className="product-card reveal">
+            <div className="product-img">
+              <img src="https://images.unsplash.com/photo-1567456225042-4e038a4ef3f2?w=600&q=80" alt="Kit Aventura"/>
+              <span className="product-tag">Promo</span>
+            </div>
+            <div className="product-info">
+              <h4>Kit Aventura Pro</h4>
+              <div className="product-meta">
+                <span className="product-price">$124.000</span>
+                <span className="product-add">Agregar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SPLIT SECTION */}
+      <section className="split">
+        <div className="split-img">
+          <img src="https://images.unsplash.com/photo-1468818438311-4bab781ab9b8?w=900&q=80" alt="BlackWolf Lifestyle"/>
+        </div>
+        <div className="split-content">
+          <div className="section-label">Comunidad</div>
+          <h2>Join<br/><em>the pack</em></h2>
+          <p>Una comunidad de aventureros que no hace concesiones. Comparte rutas, experiencias y el mismo compromiso con lo que los mueve.</p>
+          <a href="#" className="btn-dark">Unirse ahora</a>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="testimonials">
+        <div className="testimonials-inner">
+          <h2 className="reveal">Lo que dicen<br/>los que se mueven</h2>
+          <div className="testimonials-grid">
+            <div className="testimonial reveal">
+              <p className="t-quote">El collar GPS cambió completamente la forma en que salgo a correr con mi perro. Tranquilidad total en tiempo real.</p>
+              <div className="t-author">
+                <div className="t-avatar">MG</div>
+                <div>
+                  <div className="t-name">María González</div>
+                  <div className="t-role">Dueña de mascota · Buenos Aires</div>
+                </div>
+              </div>
+            </div>
+            <div className="testimonial reveal">
+              <p className="t-quote">Tecnología de vanguardia con un diseño que no grita. Mi tracker GPS es lo primero que meto en la mochila antes de cada salida.</p>
+              <div className="t-author">
+                <div className="t-avatar">CR</div>
+                <div>
+                  <div className="t-name">Carlos Rodríguez</div>
+                  <div className="t-role">Trail runner · Mendoza</div>
+                </div>
+              </div>
+            </div>
+            <div className="testimonial reveal">
+              <p className="t-quote">Cada producto está pensado para durar. No es equipamiento descartable — se nota que detrás hay alguien que realmente lo usa.</p>
+              <div className="t-author">
+                <div className="t-avatar">AL</div>
+                <div>
+                  <div className="t-name">Ana López</div>
+                  <div className="t-role">Entrenadora fitness · Rosario</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MANIFESTO */}
+      <section className="manifesto">
+        <div className="manifesto-inner reveal">
+          <h2>Built for<br/><em>movement</em></h2>
+          <p>BlackWolf diseña herramientas para la vida diaria. Movimiento, adaptación y evolución constante en cada producto.</p>
+          <div className="manifesto-actions">
+            <Link href="/store" className="btn-primary">Explorar colección</Link>
+            <a href="#" className="btn-ghost">Nuestra historia →</a>
+          </div>
+        </div>
+      </section>
+
+      {/* NEWSLETTER */}
+      <section className="newsletter">
+        <div className="newsletter-text reveal">
+          <div className="section-label">Comunidad</div>
+          <h2>Mantente<br/>conectado</h2>
+        </div>
+        <div className="newsletter-form reveal">
+          <p>Novedades, ofertas exclusivas y consejos de equipamiento. Sin spam, solo contenido que vale la pena.</p>
+          <div className="nl-input-row">
+            <input type="email" placeholder="tu@email.com"/>
+            <button type="button">Suscribirse</button>
+          </div>
+          <p style={{fontSize:'0.78rem',opacity:'0.7'}}>Podés darte de baja cuando quieras.</p>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer>
+        <div className="footer-top">
+          <div className="footer-brand">
+            <img src="/logos/Logo-Blackwolf-Light.png" alt="BlackWolf" className="nav-logo" />
+            <p>Equipamiento técnico premium para humanos y mascotas. Diseñado para moverse distinto.</p>
+          </div>
+          <div className="footer-col">
+            <h5>Tienda</h5>
+            <ul>
+              <li><a href="#">Novedades</a></li>
+              <li><a href="#">GPS & Tracking</a></li>
+              <li><a href="#">Collares</a></li>
+              <li><a href="#">Mochilas</a></li>
+              <li><a href="#">Kits</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h5>Empresa</h5>
+            <ul>
+              <li><a href="#">Nosotros</a></li>
+              <li><a href="#">Tecnología</a></li>
+              <li><a href="#">Comunidad</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h5>Soporte</h5>
+            <ul>
+              <li><a href="#">Envíos</a></li>
+              <li><a href="#">Devoluciones</a></li>
+              <li><a href="#">Garantía</a></li>
+              <li><a href="#">Contacto</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>© 2025 BlackWolf World. Todos los derechos reservados.</p>
+          <p>Buenos Aires, Argentina</p>
+        </div>
+      </footer>
+
+
+      <script>{`
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+          nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+      `}</script>
+    </main>
+  );
+}
