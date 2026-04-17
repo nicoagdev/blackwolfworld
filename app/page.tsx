@@ -86,7 +86,7 @@ const bandItems = [
 
 export default function HomePage() {
 
-  const { allProducts, loading: productsLoading } = useProducts();
+  const { allProducts, loading: productsLoading, error: productsError } = useProducts();
   const { addToCart } = useCart();
   const featuredProducts = allProducts.slice(0, 4);
 
@@ -246,6 +246,16 @@ export default function HomePage() {
           {productsLoading ? (
             <div className="flex items-center justify-center py-20">
               <div className="w-8 h-8 border-2 border-bw-gold/20 border-t-bw-gold rounded-full animate-spin" />
+            </div>
+          ) : productsError ? (
+            <div className="text-center py-20">
+              <p className="font-body text-sm text-bw-muted mb-4">No pudimos cargar los productos en este momento.</p>
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 px-8 py-3.5 bg-bw-gold text-bw-black font-display font-bold text-xs uppercase tracking-[0.15em] rounded-full hover:bg-bw-gold-light transition-colors duration-300"
+              >
+                Reintentar
+              </Link>
             </div>
           ) : featuredProducts.length === 0 ? (
             <p className="font-body text-sm text-bw-muted text-center py-20">No hay productos disponibles aún.</p>

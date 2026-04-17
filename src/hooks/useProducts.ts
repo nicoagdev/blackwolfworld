@@ -18,9 +18,10 @@ const useProducts = () => {
       const data = await getProducts();
       setProducts(data);
       setFilteredProducts(data);
-    } catch (err) {
-      setError('Error al cargar productos. Intenta nuevamente.');
-      console.error('Error fetching products:', err);
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail?.message || 'Error al cargar productos. Intenta nuevamente.';
+      setError(msg);
+      console.error('Error fetching products:', err?.response?.data || err);
     } finally {
       setLoading(false);
     }

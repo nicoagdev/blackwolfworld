@@ -34,8 +34,16 @@ export async function GET(request: NextRequest) {
             },
         });
         return NextResponse.json(response.data);
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    } catch (error: any) {
+        const detail = {
+            message: error?.message,
+            status: error?.response?.status,
+            data: error?.response?.data,
+            url: `${API_URL}/wp-json/wc/v3/products`,
+            hasKey: !!CONSUMER_KEY,
+            hasSecret: !!CONSUMER_SECRET,
+        };
+        console.error('Error fetching products:', detail);
+        return NextResponse.json({ error: 'Failed to fetch products', detail }, { status: 500 });
     }
 }
