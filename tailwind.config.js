@@ -97,6 +97,7 @@ module.exports = {
         'fade-up': 'fadeUp 0.8s ease forwards',
         'fade-in': 'fadeIn 0.6s ease forwards',
         'scale-in': 'scaleIn 0.5s ease forwards',
+        'marquee': 'marquee 25s linear infinite',
       },
       keyframes: {
         fadeUp: {
@@ -110,6 +111,10 @@ module.exports = {
         scaleIn: {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
     }

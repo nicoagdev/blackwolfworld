@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { ArrowRight, Shield, Radio, Eye, ChevronRight } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
@@ -14,20 +13,10 @@ import { Product } from '@/types/product';
 /* ── Helpers ─────────────────────────────────────────── */
 
 function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
-
   return (
-    <motion.section
-      ref={ref}
-      id={id}
-      initial={{ opacity: 0, y: 32 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-      className={className}
-    >
+    <section id={id} className={className}>
       {children}
-    </motion.section>
+    </section>
   );
 }
 
@@ -96,10 +85,6 @@ const bandItems = [
 /* ── Page ────────────────────────────────────────────── */
 
 export default function HomePage() {
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
-  const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   const { allProducts, loading: productsLoading } = useProducts();
   const { addToCart } = useCart();
@@ -114,27 +99,24 @@ export default function HomePage() {
       <Header />
 
       {/* ─── HERO ─── */}
-      <section ref={heroRef} className="relative h-svh min-h-[680px] flex items-end">
+      <section className="relative h-svh min-h-[580px] md:min-h-[680px] flex items-end">
         {/* Background */}
-        <motion.div style={{ y: heroY }} className="absolute inset-0 -z-0">
+        <div className="absolute inset-0 -z-0">
           <img
-            src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=1800&q=80"
+            src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&q=70"
             alt="BlackWolf aventura"
             className="w-full h-full object-cover"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-bw-black via-bw-black/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-bw-black via-transparent to-transparent" />
-        </motion.div>
+        </div>
 
         {/* Content */}
-        <motion.div
-          style={{ opacity: heroOpacity }}
+        <div
           className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 pb-20 md:pb-28"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          <div
             className="max-w-xl"
           >
             <SectionLabel>Nueva colección 2025</SectionLabel>
@@ -162,16 +144,13 @@ export default function HomePage() {
                 Nuestra historia <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ─── BAND ─── */}
       <div className="bg-bw-gold py-3 overflow-hidden">
-        <div
-          className="flex items-center gap-8 whitespace-nowrap"
-          style={{ animation: 'scroll 20s linear infinite', width: 'max-content' }}
-        >
+        <div className="flex items-center gap-8 whitespace-nowrap w-max animate-marquee">
           {[...bandItems, ...bandItems, ...bandItems].map((item, i) => (
             <span key={i} className="flex items-center gap-3 font-display text-[0.65rem] font-bold uppercase tracking-[0.2em] text-bw-black">
               <span className="w-1 h-1 rounded-full bg-bw-black/40" />
@@ -207,7 +186,7 @@ export default function HomePage() {
           <div className="relative">
             <div className="aspect-[4/5] rounded-apple-xl overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=900&q=80"
+                src="https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=600&q=70"
                 alt="Aventura BlackWolf"
                 className="w-full h-full object-cover"
               />
@@ -333,7 +312,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2">
           <div className="relative aspect-square md:aspect-auto">
             <img
-              src="https://images.unsplash.com/photo-1468818438311-4bab781ab9b8?w=900&q=80"
+              src="https://images.unsplash.com/photo-1468818438311-4bab781ab9b8?w=600&q=70"
               alt="BlackWolf Lifestyle"
               className="w-full h-full object-cover"
             />

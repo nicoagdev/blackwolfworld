@@ -38,15 +38,15 @@ export default function Footer() {
     <footer className="bg-bw-black border-t border-bw-gold/8">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 pt-16 pb-8">
         {/* Top section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16 pb-16 border-b border-white/5">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-12 pb-12 border-b border-white/5">
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <div className="col-span-2">
             <img
               src="/logos/Logo-Blackwolf-Light.png"
               alt="BlackWolf"
-              className="h-10 w-auto object-contain mb-5"
+              className="h-8 md:h-10 w-auto object-contain mb-4"
             />
-            <p className="font-body text-body text-bw-muted max-w-xs leading-relaxed">
+            <p className="font-body text-sm text-bw-muted max-w-xs leading-relaxed">
               Equipamiento técnico premium para humanos y mascotas. Diseñado para moverse distinto.
             </p>
           </div>
@@ -54,15 +54,15 @@ export default function Footer() {
           {/* Link columns */}
           {columns.map((col) => (
             <div key={col.title}>
-              <h5 className="font-display font-semibold text-overline uppercase tracking-[0.18em] text-bw-gold mb-5">
+              <h5 className="font-display font-semibold text-[0.7rem] uppercase tracking-[0.18em] text-bw-gold mb-4">
                 {col.title}
               </h5>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="font-body text-caption text-bw-muted hover:text-bw-cream transition-colors duration-300"
+                      className="font-body text-sm text-bw-muted hover:text-bw-cream transition-colors duration-300"
                     >
                       {link.label}
                     </Link>
@@ -74,7 +74,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom section */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="font-body text-xs text-bw-muted/60">
             © {new Date().getFullYear()} BlackWolf World. Todos los derechos reservados.
           </p>
