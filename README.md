@@ -67,6 +67,41 @@ Open your browser and navigate to `http://localhost:3000` to view the applicatio
 
 For deploying the application, you can use platforms like Vercel, Netlify, or any other hosting service that supports Next.js.
 
+## Formulario por email con Resend
+
+Se agregó un sistema de envío de formularios usando Resend.
+
+### Variables de entorno necesarias
+
+Definí estas variables en tu `.env`:
+
+```
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxx
+RESEND_FROM_EMAIL=onboarding@resend.dev
+RESEND_TO_EMAIL=tu-buzon@dominio.com
+```
+
+### Endpoint
+
+`POST /api/forms`
+
+Payload base:
+
+```json
+{
+   "formType": "newsletter",
+   "data": {
+      "email": "cliente@dominio.com"
+   }
+}
+```
+
+`formType` soportados:
+
+- `newsletter`
+- `contact`
+- `checkout`
+
 ### Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.

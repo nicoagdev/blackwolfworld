@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowRight, Shield, Radio, Eye, ChevronRight } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
@@ -34,20 +34,20 @@ const features = [
   {
     num: '01',
     icon: Shield,
-    title: 'Resistencia Alpha',
-    desc: 'Materiales compuestos de grado militar, resistentes a impactos, agua y abrasión extrema. Certificados para las condiciones más exigentes del terreno, ya sea una mordida o una caída en el asfalto.',
+    title: 'Calidad sin jerarquías',
+    desc: 'Utilizamos exactamente las mismas telas de alto rendimiento y herrajes tanto para una bandolera como para un pretal. Tu compañero merece la misma durabilidad y diseño que vos.',
   },
   {
     num: '02',
     icon: Radio,
-    title: 'Ingeniería Funcional',
-    desc: 'Paneles MOLLE integrados y puntos de anclaje técnicos. Adapta tu carga (bandolera o pechera) con la misma facilidad que tu mascota lleva su arnés de alto rendimiento.',
+    title: 'Testeado en el terreno',
+    desc: 'Nada de pruebas de laboratorio simuladas. Cada diseño rinde bajo presión extrema porque lo probamos donde más se desgasta: sol implacable, arena, agua y uso intensivo diario.',
   },
   {
     num: '03',
     icon: Eye,
-    title: 'Ergonomía Dinámica',
-    desc: 'Formas estudiadas para máxima comodidad en movimiento tanto para el humano como para el animal. Diseños probados por más de 500 horas en campo para garantizar un ajuste perfecto sin restricciones.',
+    title: 'Precisión de taller',
+    desc: 'Detrás de cada pieza hay moldería exacta, corte meticuloso y costuras reforzadas hechas por nuestro propio equipo. Un proceso controlado de principio a fin para garantizar que cada producto sea impecable.',
   },
 ];
 
@@ -55,22 +55,16 @@ const features = [
 
 const testimonials = [
   {
-    quote: 'La cama BlackWolf es sencillamente indestructible. Mis perros suelen romper todo, pero esta sigue intacta después de meses de uso intensivo. Finalmente, equipamiento que está a la altura de su energía.',
-    initials: 'MB',
-    name: 'Matías Bianchi',
-    role: 'Adiestrador Canino · Córdoba',
+    quote: 'Compré la riñonera para mí y terminé pidiendo el pretal a la semana. Es increíble ver que usan los mismos materiales técnicos para ambos. Se bancan la arena, el sol de la playa y siguen intactos.',
+    initials: 'LM',
+    name: 'Lucas M.',
+    role: 'Surfista y dueño de un Border Collie',
   },
   {
-    quote: 'El chest rig para celular es perfecto para mis sesiones de trail running. No rebota, protege mi teléfono y tiene espacio para lo esencial. Me da una libertad total de movimiento.',
-    initials: 'EV',
-    name: 'Elena Valenzuela',
-    role: 'Trail Runner · Bariloche',
-  },
-  {
-    quote: 'Me encanta la estética técnica y oscura. Uso la riñonera BlackWolf a diario para ir al estudio y combino el arnés de mi perro para nuestros paseos. Se nota que detrás hay alguien que realmente usa estos productos.',
-    initials: 'JP',
-    name: 'Javier Pérez',
-    role: 'Fotógrafo de Naturaleza · Buenos Aires',
+    quote: 'Se nota que no es un producto industrial más. La confección, las costuras... tienen una calidad tremenda. Siento la seguridad total cuando salimos a caminar, y estéticamente nos vemos impecables.',
+    initials: 'SF',
+    name: 'Sofía F.',
+    role: 'Fotógrafa urbana',
   },
 ];
 
@@ -82,16 +76,111 @@ const bandItems = [
   'Tecnología premium',
 ];
 
+const featuredFilters = ['Todo', 'Movimiento', 'Hábitat', 'Esenciales'] as const;
+type FeaturedFilter = typeof featuredFilters[number];
+
+const featuredFilterTaxonomy: Record<Exclude<FeaturedFilter, 'Todo'>, { slugs: string[]; names: string[] }> = {
+  Movimiento: {
+    slugs: ['arneses', 'pretales', 'collares', 'correas', 'bandoleras', 'rinoneras', 'chest-rigs'],
+    names: ['Arneses', 'Pretales', 'Collares', 'Correas', 'Bandoleras', 'Riñoneras', 'Chest Rigs'],
+  },
+  Hábitat: {
+    slugs: ['camas', 'descanso', 'hogar', 'outdoor', 'playa'],
+    names: ['Camas', 'Descanso', 'Hogar', 'Outdoor', 'Playa'],
+  },
+  Esenciales: {
+    slugs: ['kits', 'esenciales', 'mochilas', 'bolsos', 'neceseres', 'accesorios'],
+    names: ['Kits', 'Esenciales', 'Mochilas', 'Bolsos', 'Neceseres', 'Accesorios'],
+  },
+};
+
+const normalizeText = (text: string): string =>
+  text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+const matchesFeaturedFilter = (product: Product, filterName: FeaturedFilter): boolean => {
+  if (filterName === 'Todo') {
+    return true;
+  }
+
+  const taxonomy = featuredFilterTaxonomy[filterName];
+
+  return product.categories.some((category) => {
+    const categorySlug = normalizeText(category.slug);
+    const categoryName = normalizeText(category.name);
+
+    return (
+      taxonomy.slugs.some((slug) => normalizeText(slug) === categorySlug) ||
+      taxonomy.names.some((name) => normalizeText(name) === categoryName)
+    );
+  });
+};
+
 /* ── Page ────────────────────────────────────────────── */
 
 export default function HomePage() {
 
   const { allProducts, loading: productsLoading, error: productsError } = useProducts();
   const { addToCart } = useCart();
-  const featuredProducts = allProducts.slice(0, 4);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
+  const [activeFeaturedFilter, setActiveFeaturedFilter] = useState<FeaturedFilter>('Todo');
+
+  const featuredProducts = useMemo(() => {
+    const filteredProducts = allProducts.filter((product) => matchesFeaturedFilter(product, activeFeaturedFilter));
+    return filteredProducts.slice(0, 4);
+  }, [activeFeaturedFilter, allProducts]);
 
   const handleAddToCart = (product: Product) => {
     addToCart({ ...product, quantity: 1 });
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const trimmedEmail = newsletterEmail.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(trimmedEmail)) {
+      setNewsletterStatus('error');
+      setNewsletterMessage('Ingresá un email válido.');
+      return;
+    }
+
+    setNewsletterStatus('loading');
+    setNewsletterMessage('');
+
+    try {
+      const response = await fetch('/api/forms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formType: 'newsletter',
+          data: {
+            email: trimmedEmail,
+            source: 'home_newsletter',
+          },
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'No se pudo enviar el formulario.');
+      }
+
+      setNewsletterStatus('success');
+      setNewsletterMessage('Suscripción realizada. Revisa tu correo.');
+      setNewsletterEmail('');
+    } catch (error) {
+      setNewsletterStatus('error');
+      setNewsletterMessage(error instanceof Error ? error.message : 'Error enviando el formulario.');
+    }
   };
 
   return (
@@ -126,12 +215,12 @@ export default function HomePage() {
             <SectionLabel>Nueva Colección 2026</SectionLabel>
 
             <h1 className="font-display font-bold text-[clamp(3.5rem,8vw,7rem)] leading-[0.9] tracking-tight mt-2">
-              EQUIPAMIENTO<br />
-              <span className="text-bw-gold">ALPHA</span>
+              UNA SOLA<br />
+              <span className="text-bw-gold">MANADA</span>
             </h1>
 
             <p className="font-body text-base md:text-lg text-bw-warm/80 mt-6 max-w-md leading-relaxed">
-              Herramientas técnicas diseñadas para la supervivencia urbana y la exploración sin límites. BlackWolf fusiona la resistencia para mascotas con la funcionalidad para humanos en una sola visión: equipar a la manada entera.
+              Equipamiento táctico y urbano sin distinciones. La misma calidad extrema, las mismas telas de alto rendimiento para vos y tu mascota. Porque en BlackWolf no hay jerarquías, solo libertad para movernos juntos.
             </p>
 
             <div className="flex items-center gap-4 mt-10">
@@ -170,14 +259,11 @@ export default function HomePage() {
           <div>
             <SectionLabel>Nuestra filosofía</SectionLabel>
             <h2 className="font-display font-bold text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.95] tracking-tight">
-              Evolución<br />
-              <span className="text-bw-gold">Sinérgica</span>
+              Libertad<br />
+              <span className="text-bw-gold">sin etiquetas</span>
             </h2>
             <p className="font-body text-base text-bw-warm/70 mt-8 leading-relaxed max-w-lg">
-              BlackWolf nació de una convicción simple: el equipamiento técnico no debería elegir entre rendimiento y diseño, ni para ti ni para tu mascota. Cada producto es el resultado de años de investigación en campo, uniendo la resistencia estructural con la ergonomía avanzada.
-            </p>
-            <p className="font-body text-base text-bw-warm/50 mt-4 leading-relaxed max-w-lg">
-              Desde el asfalto de la ciudad hasta los senderos más exigentes, somos una marca que entiende que el crecimiento se logra trabajando en equipo. Nos movemos contigo, te equipamos para liderar.
+              BlackWolf nació frente a una máquina de coser casera con una convicción clara: la verdadera libertad es poder expresar lo que uno es sin miedo a ser juzgado. Creemos que mascotas y personas son uno solo. Por eso, rompemos la línea que los separa. No hacemos "accesorios para mascotas" o "accesorios para humanos"; creamos herramientas de grado técnico para una sola manada que busca la excelencia.
             </p>
             <Link
               href="/products"
@@ -205,10 +291,10 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-6 md:px-12">
           <div className="grid md:grid-cols-2 gap-8 mb-20">
             <h2 className="font-display font-bold text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.95] tracking-tight">
-              Por qué<br />BlackWolf
+              Ingeniería para<br />el mundo real
             </h2>
             <p className="font-body text-base text-bw-warm/60 leading-relaxed self-end max-w-md">
-              Diseñamos herramientas para los que lideran el camino, no para los que lo siguen. Nuestra tecnología está probada en las condiciones más duras para asegurar que tu equipo nunca sea el eslabón débil de la manada.
+              Buscamos siempre los mejores materiales posibles, y si los podemos mejorar, lo hacemos. Cada detalle está pensado para rendir al máximo, sin importar quién lo lleve puesto.
             </p>
           </div>
 
@@ -233,7 +319,7 @@ export default function HomePage() {
       </Section>
 
       {/* ─── PRODUCTS ─── */}
-      <Section className="py-28 md:py-40">
+      <Section id="featured" className="py-28 md:py-40">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12">
           <div className="flex items-end justify-between mb-16">
             <h2 className="font-display font-bold text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.95] tracking-tight">
@@ -245,6 +331,23 @@ export default function HomePage() {
             >
               Ver toda la colección <ArrowRight className="w-3.5 h-3.5" />
             </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-8">
+            {featuredFilters.map((filterName) => (
+              <button
+                key={filterName}
+                type="button"
+                onClick={() => setActiveFeaturedFilter(filterName)}
+                className={`px-4 py-2 border rounded-full font-display text-[0.62rem] font-bold uppercase tracking-[0.14em] transition-colors duration-300 ${
+                  activeFeaturedFilter === filterName
+                    ? 'border-bw-gold bg-bw-gold/10 text-bw-gold'
+                    : 'border-white/15 text-bw-cream/70 hover:border-bw-gold hover:text-bw-gold'
+                }`}
+              >
+                {filterName}
+              </button>
+            ))}
           </div>
 
           {productsLoading ? (
@@ -322,7 +425,7 @@ export default function HomePage() {
       </Section>
 
       {/* ─── SPLIT / COMMUNITY ─── */}
-      <Section className="min-h-[600px]">
+      <Section id="community" className="min-h-[600px]">
         <div className="grid md:grid-cols-2">
           <div className="relative aspect-square md:aspect-auto">
             <img
@@ -339,7 +442,7 @@ export default function HomePage() {
                 <span className="text-bw-brown">la Manada</span>
               </h2>
               <p className="font-body text-base text-bw-brown/70 mt-6 leading-relaxed">
-                Somos más que equipamiento; somos una comunidad de aventureros y líderes que no hacen concesiones. Comparte rutas, experiencias y el mismo compromiso con el crecimiento y la exploración.
+                Una forma de ver la vida. Una comunidad que valora la libertad y el movimiento constante. Equipate con nosotros y compartí el camino con aquellos que no tienen miedo de ser quienes realmente son.
               </p>
               <button className="mt-10 px-8 py-3.5 bg-bw-black text-bw-cream font-display font-bold text-xs uppercase tracking-[0.15em] rounded-full hover:bg-bw-dark transition-colors duration-300">
                 Unirse ahora
@@ -357,7 +460,7 @@ export default function HomePage() {
             <span className="text-bw-gold">los que se mueven</span>
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {testimonials.map((t, i) => (
               <div
                 key={i}
@@ -406,11 +509,11 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-2xl mx-auto px-6 text-center">
           <h2 className="font-display font-bold text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.95] tracking-tight">
-            Movimiento en<br />
-            <span className="text-bw-gold">Sinergia</span>
+            Una sola<br />
+            <span className="text-bw-gold">visión</span>
           </h2>
           <p className="font-body text-base text-bw-warm/60 mt-8 leading-relaxed max-w-lg mx-auto">
-            BlackWolf diseña herramientas para la vida diaria de la manada entera. Movimiento constante, adaptación táctica y evolución compartida en cada producto. No fabricamos accesorios descartables; creamos equipo para que tú y tu compañero podáis liderar vuestro propio camino.
+            Nuestro objetivo es simple: unificarlo todo. Que BlackWolf sea la marca definitiva que te acompañe a vos y a tu compañero en cada paso, con el diseño y la resistencia que exigen los líderes de la manada.
           </p>
           <div className="flex items-center justify-center gap-4 mt-12">
             <Link
@@ -430,7 +533,7 @@ export default function HomePage() {
       </Section>
 
       {/* ─── NEWSLETTER ─── */}
-      <Section className="bg-bw-cream py-24 md:py-32">
+      <Section id="newsletter" className="bg-bw-cream py-24 md:py-32">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 md:gap-24 items-center">
           <div>
             <span className="inline-block font-display text-[0.65rem] font-bold uppercase tracking-[0.25em] text-bw-brown mb-4">
@@ -447,23 +550,34 @@ export default function HomePage() {
             </p>
             <form
               className="flex gap-3"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleNewsletterSubmit}
             >
               <input
                 type="email"
                 placeholder="tu@email.com"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                required
                 className="flex-1 px-5 py-3.5 bg-bw-black/5 border border-bw-black/10 rounded-full font-body text-sm text-bw-black placeholder:text-bw-brown/40 focus:outline-none focus:border-bw-brown/40 transition-colors"
               />
               <button
                 type="submit"
+                disabled={newsletterStatus === 'loading'}
                 className="px-8 py-3.5 bg-bw-black text-bw-cream font-display font-bold text-xs uppercase tracking-[0.15em] rounded-full hover:bg-bw-dark transition-colors duration-300"
               >
-                Suscribirse
+                {newsletterStatus === 'loading' ? 'Enviando...' : 'Suscribirse'}
               </button>
             </form>
             <p className="font-body text-[0.65rem] text-bw-brown/40 mt-3">
               Podés darte de baja cuando quieras.
             </p>
+            {newsletterStatus !== 'idle' && (
+              <p
+                className={`font-body text-xs mt-2 ${newsletterStatus === 'success' ? 'text-green-700' : 'text-red-700'}`}
+              >
+                {newsletterMessage}
+              </p>
+            )}
           </div>
         </div>
       </Section>

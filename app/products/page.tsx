@@ -1,25 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProductList from '@/components/ecom/ProductList';
 import SearchBar from '@/components/common/SearchBar';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import { getProducts } from '@/services/woo/products';
 import { Product } from '@/types/product';
+import { getAvailableCategories } from '@/utils/productCategories';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filtered, setFiltered] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const data = await getProducts();
         setProducts(data);
-        setFiltered(data);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -29,14 +32,33 @@ const ProductsPage = () => {
     loadProducts();
   }, []);
 
-  const handleSearch = (query: string) => {
-    if (!query.trim()) {
-      setFiltered(products);
-      return;
+  const categories = useMemo(() => getAvailableCategories(products), [products]);
+
+  const filtered = useMemo(() => {
+    const categoryScopedProducts = activeCategory
+      ? products.filter((product) =>
+          product.categories.some((category) => category.slug === activeCategory)
+        )
+      : products;
+
+    if (!searchQuery.trim()) {
+      return categoryScopedProducts;
     }
-    const q = query.toLowerCase();
-    setFiltered(products.filter((p) => p.name.toLowerCase().includes(q)));
+
+    const normalizedQuery = searchQuery.toLowerCase();
+
+    return categoryScopedProducts.filter((product) =>
+      product.name.toLowerCase().includes(normalizedQuery) ||
+      product.description.toLowerCase().includes(normalizedQuery) ||
+      product.categories.some((category) => category.name.toLowerCase().includes(normalizedQuery))
+    );
+  }, [activeCategory, products, searchQuery]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
+
+  const activeCategoryLabel = categories.find((category) => category.slug === activeCategory)?.name;
 
   return (
     <div className="min-h-screen bg-bw-black text-bw-cream">
@@ -45,10 +67,10 @@ const ProductsPage = () => {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <span className="inline-block font-display text-[0.65rem] font-bold uppercase tracking-[0.25em] text-bw-gold mb-3">
-              Colección
+              {activeCategoryLabel ? `Categoria: ${activeCategoryLabel}` : 'Colección'}
             </span>
             <h1 className="font-display font-bold text-[clamp(2.5rem,5vw,4rem)] leading-[0.95] tracking-tight">
-              Todos los productos
+              {activeCategoryLabel ? activeCategoryLabel : 'Todos los productos'}
             </h1>
           </div>
           <div className="w-full md:w-80">

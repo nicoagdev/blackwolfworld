@@ -16,6 +16,7 @@ const CheckoutForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,11 +27,37 @@ const CheckoutForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
-      // Call your API to process the order here
+      const response = await fetch('/api/forms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formType: 'checkout',
+          data: formData,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Error al procesar el pedido. Intentá nuevamente.');
+      }
+
+      setSuccessMessage('Pedido enviado. Te contactaremos por email para confirmar.');
+      setFormData({
+        name: '',
+        email: '',
+        address: '',
+        city: '',
+        postalCode: '',
+        country: '',
+      });
     } catch (err) {
-      setError('Error al procesar el pedido. Intentá nuevamente.');
+      setError(err instanceof Error ? err.message : 'Error al procesar el pedido. Intentá nuevamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -63,6 +90,12 @@ const CheckoutForm = () => {
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
           <p className="font-body text-sm text-red-400">{error}</p>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 mb-6">
+          <p className="font-body text-sm text-green-400">{successMessage}</p>
         </div>
       )}
 
