@@ -444,9 +444,12 @@ export default function HomePage() {
               <p className="font-body text-base text-bw-brown/70 mt-6 leading-relaxed">
                 Una forma de ver la vida. Una comunidad que valora la libertad y el movimiento constante. Equipate con nosotros y compartí el camino con aquellos que no tienen miedo de ser quienes realmente son.
               </p>
-              <button className="mt-10 px-8 py-3.5 bg-bw-black text-bw-cream font-display font-bold text-xs uppercase tracking-[0.15em] rounded-full hover:bg-bw-dark transition-colors duration-300">
+              <Link
+                href="/la-manada"
+                className="mt-10 inline-flex px-8 py-3.5 bg-bw-black text-bw-cream font-display font-bold text-xs uppercase tracking-[0.15em] rounded-full hover:bg-bw-dark transition-colors duration-300"
+              >
                 Unirse ahora
-              </button>
+              </Link>
             </div>
           </div>
         </div>
