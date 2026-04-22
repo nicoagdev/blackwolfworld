@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { AtSign, Mail, MapPin, MessageCircle } from 'lucide-react';
 import useProducts from '@/hooks/useProducts';
 import { getAvailableCategories } from '@/utils/productCategories';
 
@@ -35,27 +36,33 @@ export default function Footer() {
               BlackWolf crea equipamiento para humanos y mascotas con una misma lógica: resistencia real, diseño funcional y una identidad de manada.
             </p>
             <div className="mt-6 space-y-2 font-body text-sm text-bw-muted">
-              <p>Villa Gesell</p>
+              <p className="inline-flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-bw-gold" />
+                Villa Gesell
+              </p>
               <a
                 href="mailto:hola@blackwolfworld.com"
-                className="block hover:text-bw-cream transition-colors duration-300"
+                className="inline-flex items-center gap-2 hover:text-bw-cream transition-colors duration-300"
               >
+                <Mail className="w-4 h-4 text-bw-gold" />
                 hola@blackwolfworld.com
               </a>
               <a
                 href="http://wa.me/5492255421676"
                 target="_blank"
                 rel="noreferrer"
-                className="block hover:text-bw-cream transition-colors duration-300"
+                className="inline-flex items-center gap-2 hover:text-bw-cream transition-colors duration-300"
               >
+                <MessageCircle className="w-4 h-4 text-bw-gold" />
                 WhatsApp
               </a>
               <a
                 href="https://instagram.com/blackwolf_world"
                 target="_blank"
                 rel="noreferrer"
-                className="block hover:text-bw-cream transition-colors duration-300"
+                className="inline-flex items-center gap-2 hover:text-bw-cream transition-colors duration-300"
               >
+                <AtSign className="w-4 h-4 text-bw-gold" />
                 @blackwolf_world
               </a>
             </div>
