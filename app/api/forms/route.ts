@@ -37,18 +37,28 @@ const buildEmailPayload = (payload: FormRequestBody) => {
     if (formType === 'contact') {
         const name = getString(data.name);
         const email = getString(data.email).toLowerCase();
+        const phone = getString(data.phone);
+        const profile = getString(data.profile);
+        const reason = getString(data.reason);
+        const company = getString(data.company);
+        const orderReference = getString(data.orderReference);
         const message = getString(data.message);
 
-        if (!name || !emailRegex.test(email) || !message) {
+        if (!name || !emailRegex.test(email) || !profile || !reason || !message) {
             return { error: 'Faltan datos requeridos para formulario de contacto.' };
         }
 
         return {
-            subject: `Nuevo mensaje de contacto: ${name}`,
+            subject: `Nuevo contacto (${profile}): ${name}`,
             html: `
                 <h2>Formulario de contacto</h2>
                 <p><strong>Nombre:</strong> ${name}</p>
                 <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Perfil:</strong> ${profile}</p>
+                <p><strong>Motivo:</strong> ${reason}</p>
+                <p><strong>Telefono:</strong> ${phone || 'no informado'}</p>
+                <p><strong>Empresa:</strong> ${company || 'no informada'}</p>
+                <p><strong>Nro. de pedido:</strong> ${orderReference || 'no informado'}</p>
                 <p><strong>Mensaje:</strong></p>
                 <p>${message.replace(/\n/g, '<br />')}</p>
             `,

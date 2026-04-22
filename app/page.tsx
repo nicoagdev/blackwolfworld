@@ -9,6 +9,7 @@ import Footer from '@/components/common/Footer';
 import useProducts from '@/hooks/useProducts';
 import useCart from '@/hooks/useCart';
 import { Product } from '@/types/product';
+import { getAvailableCategories } from '@/utils/productCategories';
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -76,46 +77,9 @@ const bandItems = [
   'Tecnología premium',
 ];
 
-const featuredFilters = ['Todo', 'Movimiento', 'Hábitat', 'Esenciales'] as const;
-type FeaturedFilter = typeof featuredFilters[number];
-
-const featuredFilterTaxonomy: Record<Exclude<FeaturedFilter, 'Todo'>, { slugs: string[]; names: string[] }> = {
-  Movimiento: {
-    slugs: ['arneses', 'pretales', 'collares', 'correas', 'bandoleras', 'rinoneras', 'chest-rigs'],
-    names: ['Arneses', 'Pretales', 'Collares', 'Correas', 'Bandoleras', 'Riñoneras', 'Chest Rigs'],
-  },
-  Hábitat: {
-    slugs: ['camas', 'descanso', 'hogar', 'outdoor', 'playa'],
-    names: ['Camas', 'Descanso', 'Hogar', 'Outdoor', 'Playa'],
-  },
-  Esenciales: {
-    slugs: ['kits', 'esenciales', 'mochilas', 'bolsos', 'neceseres', 'accesorios'],
-    names: ['Kits', 'Esenciales', 'Mochilas', 'Bolsos', 'Neceseres', 'Accesorios'],
-  },
-};
-
-const normalizeText = (text: string): string =>
-  text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-
-const matchesFeaturedFilter = (product: Product, filterName: FeaturedFilter): boolean => {
-  if (filterName === 'Todo') {
-    return true;
-  }
-
-  const taxonomy = featuredFilterTaxonomy[filterName];
-
-  return product.categories.some((category) => {
-    const categorySlug = normalizeText(category.slug);
-    const categoryName = normalizeText(category.name);
-
-    return (
-      taxonomy.slugs.some((slug) => normalizeText(slug) === categorySlug) ||
-      taxonomy.names.some((name) => normalizeText(name) === categoryName)
-    );
-  });
+type FeaturedCategoryFilter = {
+  label: string;
+  slug: string;
 };
 
 /* ── Page ────────────────────────────────────────────── */
@@ -127,12 +91,22 @@ export default function HomePage() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [newsletterMessage, setNewsletterMessage] = useState('');
-  const [activeFeaturedFilter, setActiveFeaturedFilter] = useState<FeaturedFilter>('Todo');
+  const [activeFeaturedCategory, setActiveFeaturedCategory] = useState('all');
+
+  const featuredCategoryFilters = useMemo<FeaturedCategoryFilter[]>(() => {
+    const categories = getAvailableCategories(allProducts).slice(0, 6);
+    return [{ label: 'Todo', slug: 'all' }, ...categories.map((category) => ({ label: category.name, slug: category.slug }))];
+  }, [allProducts]);
 
   const featuredProducts = useMemo(() => {
-    const filteredProducts = allProducts.filter((product) => matchesFeaturedFilter(product, activeFeaturedFilter));
+    const filteredProducts = activeFeaturedCategory === 'all'
+      ? allProducts
+      : allProducts.filter((product) =>
+          product.categories.some((category) => category.slug === activeFeaturedCategory)
+        );
+
     return filteredProducts.slice(0, 4);
-  }, [activeFeaturedFilter, allProducts]);
+  }, [activeFeaturedCategory, allProducts]);
 
   const handleAddToCart = (product: Product) => {
     addToCart({ ...product, quantity: 1 });
@@ -231,10 +205,10 @@ export default function HomePage() {
                 Ver colección
               </Link>
               <Link
-                href="#narrative"
+                href="/manifiesto"
                 className="inline-flex items-center gap-1.5 font-display text-xs uppercase tracking-[0.15em] text-bw-cream/70 hover:text-bw-gold transition-colors duration-300"
               >
-                Nuestra historia <ArrowRight className="w-3.5 h-3.5" />
+                El manifiesto <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -334,18 +308,18 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
-            {featuredFilters.map((filterName) => (
+            {featuredCategoryFilters.map((filterItem) => (
               <button
-                key={filterName}
+                key={filterItem.slug}
                 type="button"
-                onClick={() => setActiveFeaturedFilter(filterName)}
+                onClick={() => setActiveFeaturedCategory(filterItem.slug)}
                 className={`px-4 py-2 border rounded-full font-display text-[0.62rem] font-bold uppercase tracking-[0.14em] transition-colors duration-300 ${
-                  activeFeaturedFilter === filterName
+                  activeFeaturedCategory === filterItem.slug
                     ? 'border-bw-gold bg-bw-gold/10 text-bw-gold'
                     : 'border-white/15 text-bw-cream/70 hover:border-bw-gold hover:text-bw-gold'
                 }`}
               >
-                {filterName}
+                {filterItem.label}
               </button>
             ))}
           </div>
@@ -526,10 +500,10 @@ export default function HomePage() {
               Explorar colección
             </Link>
             <Link
-              href="#narrative"
+              href="/manifiesto"
               className="inline-flex items-center gap-1.5 font-display text-xs uppercase tracking-[0.15em] text-bw-cream/70 hover:text-bw-gold transition-colors duration-300"
             >
-              Nuestra historia <ArrowRight className="w-3.5 h-3.5" />
+              El manifiesto <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
