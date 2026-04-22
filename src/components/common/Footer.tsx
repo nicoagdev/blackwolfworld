@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { AtSign, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { AtSign, Mail, MessageCircle } from 'lucide-react';
 import useProducts from '@/hooks/useProducts';
 import { getAvailableCategories } from '@/utils/productCategories';
 
@@ -105,10 +105,6 @@ export default function Footer() {
               Contacto
             </h5>
             <ul className="space-y-3 font-body text-sm text-bw-muted">
-              <li className="inline-flex items-center gap-3.5">
-                <MapPin className="w-4 h-4 text-bw-gold" />
-                <span>Villa Gesell</span>
-              </li>
               <li>
                 <a
                   href="mailto:hola@blackwolfworld.com"
