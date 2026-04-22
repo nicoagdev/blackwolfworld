@@ -25,7 +25,7 @@ export default function Footer() {
   return (
     <footer className="bg-bw-black border-t border-bw-gold/8">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12 pb-12 border-b border-white/5">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-10 mb-12 pb-12 border-b border-white/5">
           <div className="md:col-span-2">
             <img
               src="/logos/Logo-Blackwolf-Light.png"
@@ -35,37 +35,6 @@ export default function Footer() {
             <p className="font-body text-sm text-bw-muted max-w-sm leading-relaxed">
               BlackWolf crea equipamiento para humanos y mascotas con una misma lógica: resistencia real, diseño funcional y una identidad de manada.
             </p>
-            <div className="mt-6 space-y-2 font-body text-sm text-bw-muted">
-              <p className="inline-flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-bw-gold" />
-                Villa Gesell
-              </p>
-              <a
-                href="mailto:hola@blackwolfworld.com"
-                className="inline-flex items-center gap-2 hover:text-bw-cream transition-colors duration-300"
-              >
-                <Mail className="w-4 h-4 text-bw-gold" />
-                hola@blackwolfworld.com
-              </a>
-              <a
-                href="http://wa.me/5492255421676"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 hover:text-bw-cream transition-colors duration-300"
-              >
-                <MessageCircle className="w-4 h-4 text-bw-gold" />
-                WhatsApp
-              </a>
-              <a
-                href="https://instagram.com/blackwolf_world"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 hover:text-bw-cream transition-colors duration-300"
-              >
-                <AtSign className="w-4 h-4 text-bw-gold" />
-                @blackwolf_world
-              </a>
-            </div>
           </div>
 
           <div>
@@ -128,6 +97,49 @@ export default function Footer() {
                   )}
                 </li>
               ))}
+            </ul>
+          </div>
+
+          <div>
+            <h5 className="font-display font-semibold text-[0.7rem] uppercase tracking-[0.18em] text-bw-gold mb-4">
+              Contacto
+            </h5>
+            <ul className="space-y-3 font-body text-sm text-bw-muted">
+              <li className="inline-flex items-center gap-3.5">
+                <MapPin className="w-4 h-4 text-bw-gold" />
+                <span>Villa Gesell</span>
+              </li>
+              <li>
+                <a
+                  href="mailto:hola@blackwolfworld.com"
+                  className="inline-flex items-center gap-3.5 hover:text-bw-cream transition-colors duration-300"
+                >
+                  <Mail className="w-4 h-4 text-bw-gold" />
+                  <span>hola@blackwolfworld.com</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="http://wa.me/5492255421676"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3.5 hover:text-bw-cream transition-colors duration-300"
+                >
+                  <MessageCircle className="w-4 h-4 text-bw-gold" />
+                  <span>WhatsApp</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com/blackwolf_world"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3.5 hover:text-bw-cream transition-colors duration-300"
+                >
+                  <AtSign className="w-4 h-4 text-bw-gold" />
+                  <span>@blackwolf_world</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
